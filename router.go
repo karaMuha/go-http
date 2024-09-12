@@ -9,7 +9,9 @@ type Router struct {
 type handler func(conn net.Conn, r *Request)
 
 func NewRouter() Router {
-	return Router{}
+	return Router{
+		routes: make(map[string]handler),
+	}
 }
 
 func (r *Router) HandleFunc(target string, handleFunc handler) {
