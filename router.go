@@ -6,7 +6,7 @@ type Router struct {
 	routes map[string]handler
 }
 
-type handler func(conn net.Conn, r *Request)
+type handler func(conn net.Conn, r *HttpRequest)
 
 func NewRouter() Router {
 	return Router{

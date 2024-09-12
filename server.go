@@ -16,7 +16,7 @@ type Server struct {
 	Routes Router
 }
 
-type Request struct {
+type HttpRequest struct {
 	Method      string
 	URI         string
 	HttpVersion string
@@ -67,9 +67,9 @@ func (s *Server) processRequest(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
-func parseRequest(connection net.Conn) (*Request, error) {
+func parseRequest(conn net.Conn) (*HttpRequest, error) {
 	lines := make(chan []byte)
-	go byteReader(lines, connection)
+	go byteReader(lines, conn)
 	requestLineValues := bytes.Split(<-lines, []byte(" "))
 
 	if len(requestLineValues) != 3 {
@@ -95,7 +95,7 @@ func parseRequest(connection net.Conn) (*Request, error) {
 		body = append(body, bodyLine...)
 	}
 
-	return &Request{
+	return &HttpRequest{
 		Method:      method,
 		URI:         target,
 		HttpVersion: httpVersion,
