@@ -15,5 +15,6 @@ func NewRouter() Router {
 }
 
 func (r *Router) HandleFunc(target string, handleFunc handler) {
+	// TODO: check if given string is a valid target
 	r.routes[target] = handleFunc
 }
