@@ -6,7 +6,7 @@ Get the package with
 go get github.com/karaMuha/go-http
 ```
 
-Now import the package, initialize a new router and register a route
+Now import the package, initialize a new router and register a route with a target and handler. A target consists of a http method and a path like "POST /users". A handler is a func that accepts a `net.Conn` variable and a pointer to a `HttpRequest` variable as input 
 ```
 package main
 
@@ -27,7 +27,7 @@ func main() {
 }
 ```
 
-After that initialize a new server with a port and the newly created router
+After that initialize a new server with a port and the newly created router and listen for incoming requests
 ```
 package main
 
@@ -59,3 +59,4 @@ func main() {
 - provide useful functionalities for HttpRequest struct
 - allow path values
 - allow query params
+- more to come...
