@@ -131,13 +131,13 @@ func writeResponseString(response *HttpResponse) string {
 	for _, cookie := range response.cookies {
 		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
 		if !cookie.Expires.IsZero() {
-			cookieString = cookieString + "Expires=" + cookie.Expires.String()
+			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
 		}
 		if cookie.HttpOnly {
-			cookieString = cookieString + "HttpOnly"
+			cookieString = cookieString + "; HttpOnly"
 		}
 		if cookie.Secure {
-			cookieString = cookieString + "Secure"
+			cookieString = cookieString + "; Secure"
 		}
 		cookieString = cookieString + "\r\n"
 		responseString = responseString + cookieString
