@@ -52,9 +52,9 @@ func (s *Server) processRequest(conn net.Conn) {
 
 	endpoint := request.Method + " " + request.URI
 	if handler, ok := s.Routes.routes[endpoint]; ok {
-		var response HttpResponse
-		handler(&response, request)
-		responseString := writeResponseString(&response)
+		response := NewHttpResponse()
+		handler(response, request)
+		responseString := writeResponseString(response)
 		conn.Write([]byte(responseString))
 		return
 	}

@@ -9,6 +9,15 @@ type HttpResponse struct {
 	Body       []byte
 }
 
+func NewHttpResponse() *HttpResponse {
+	return &HttpResponse{
+		cookies:    make([]*Cookie, 0),
+		headers:    make(map[string]string),
+		Body:       make([]byte, 0),
+		statusCode: "200",
+	}
+}
+
 func (res *HttpResponse) SetCookie(cookie *Cookie) {
 	res.cookies = append(res.cookies, cookie)
 }
