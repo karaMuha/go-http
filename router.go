@@ -1,12 +1,10 @@
 package http
 
-import "net"
-
 type Router struct {
 	routes map[string]handler
 }
 
-type handler func(conn net.Conn, r *HttpRequest)
+type handler func(res *HttpResponse, req *HttpRequest)
 
 func NewRouter() Router {
 	return Router{
