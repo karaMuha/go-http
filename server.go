@@ -126,7 +126,7 @@ func byteReader(channel chan []byte, connection net.Conn) {
 func writeResponseString(response *HttpResponse) string {
 	responseString := "HTTP/1.1"
 	// set status code
-	responseString = responseString + " " + response.statusCode + " OK\r\n"
+	responseString = responseString + " " + response.statusCode + "\r\n"
 	// set cookies
 	for _, cookie := range response.cookies {
 		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
