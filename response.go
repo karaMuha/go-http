@@ -36,3 +36,33 @@ func (res *HttpResponse) WriteStatus(code int) {
 func (res *HttpResponse) Write(data []byte) {
 	res.Body = data
 }
+
+func (res *HttpResponse) writeResponseString() string {
+	responseString := "HTTP/1.1"
+	// set status code
+	responseString = responseString + " " + res.statusCode + "\r\n"
+	// set cookies
+	for _, cookie := range res.cookies {
+		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
+		if !cookie.Expires.IsZero() {
+			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
+		}
+		if cookie.HttpOnly {
+			cookieString = cookieString + "; HttpOnly"
+		}
+		if cookie.Secure {
+			cookieString = cookieString + "; Secure"
+		}
+		cookieString = cookieString + "\r\n"
+		responseString = responseString + cookieString
+	}
+	// set headers
+	for k, v := range res.headers {
+		headerString := k + ": " + v + "\r\n"
+		responseString = responseString + headerString
+	}
+
+	responseString = responseString + "\r\n"
+
+	return responseString
+}

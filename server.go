@@ -54,7 +54,7 @@ func (s *Server) processRequest(conn net.Conn) {
 	if handler, ok := s.Routes.routes[endpoint]; ok {
 		response := NewHttpResponse()
 		handler(response, request)
-		responseString := writeResponseString(response)
+		responseString := response.writeResponseString()
 		conn.Write([]byte(responseString))
 		return
 	}
@@ -121,34 +121,4 @@ func byteReader(channel chan []byte, connection net.Conn) {
 			return
 		}
 	}
-}
-
-func writeResponseString(response *HttpResponse) string {
-	responseString := "HTTP/1.1"
-	// set status code
-	responseString = responseString + " " + response.statusCode + "\r\n"
-	// set cookies
-	for _, cookie := range response.cookies {
-		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
-		if !cookie.Expires.IsZero() {
-			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
-		}
-		if cookie.HttpOnly {
-			cookieString = cookieString + "; HttpOnly"
-		}
-		if cookie.Secure {
-			cookieString = cookieString + "; Secure"
-		}
-		cookieString = cookieString + "\r\n"
-		responseString = responseString + cookieString
-	}
-	// set headers
-	for k, v := range response.headers {
-		headerString := k + ": " + v + "\r\n"
-		responseString = responseString + headerString
-	}
-
-	responseString = responseString + "\r\n"
-
-	return responseString
 }
