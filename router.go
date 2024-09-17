@@ -6,8 +6,8 @@ type Router struct {
 
 type handler func(res *HttpResponse, req *HttpRequest)
 
-func NewRouter() Router {
-	return Router{
+func NewRouter() *Router {
+	return &Router{
 		routes: make(map[string]handler),
 	}
 }

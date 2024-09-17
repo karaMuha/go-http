@@ -13,10 +13,10 @@ const (
 
 type Server struct {
 	Port   string
-	Routes Router
+	Routes *Router
 }
 
-func NewServer(port string, routes Router) Server {
+func NewServer(port string, routes *Router) Server {
 	return Server{
 		Port:   port,
 		Routes: routes,
