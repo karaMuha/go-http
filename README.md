@@ -42,7 +42,7 @@ func main() {
 	router := goHttp.NewRouter()
 
 	router.HandleFunc("GET /", func(res *goHttp.HttpResponse, req *goHttp.HttpRequest) {
-		fmt.Printf("Method: %s, Target: %s, Version: %s, Body: %s\n", r.Method, r.URI, r.HttpVersion, string(r.Body))
+		fmt.Printf("Method: %s, Target: %s, Version: %s, Body: %s\n", req.Method, req.URI, req.HttpVersion, string(req.Body))
 		
 		cookie := &goHttp.Cookie{
 			Name: "TestKey",
