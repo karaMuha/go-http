@@ -76,12 +76,17 @@ func parseRequest(conn net.Conn) (*HttpRequest, error) {
 	httpVersion := string(requestLineValues[2])
 
 	headers := make(map[string]string)
+	cookies := make(map[string]*Cookie)
 	for {
 		headerLine := <-lines
 		if len(headerLine) == 0 {
 			break
 		}
 		headerLineValues := bytes.Split(headerLine, []byte(": "))
+		if string(headerLineValues[0]) == "Cookie" {
+			cookies = parseCookies(headerLineValues[1])
+			continue
+		}
 		headers[string(headerLineValues[0])] = string(headerLineValues[1])
 	}
 
@@ -96,7 +101,7 @@ func parseRequest(conn net.Conn) (*HttpRequest, error) {
 		HttpVersion: httpVersion,
 		Headers:     headers,
 		Body:        body,
-		cookies:     make(map[string]*Cookie),
+		cookies:     cookies,
 	}, nil
 }
 
@@ -122,4 +127,21 @@ func byteReader(channel chan []byte, connection net.Conn) {
 			return
 		}
 	}
+}
+
+func parseCookies(cookiebytes []byte) map[string]*Cookie {
+	cookies := make(map[string]*Cookie)
+	cookieArray := bytes.Split(cookiebytes, []byte("; "))
+	for _, v := range cookieArray {
+		cookieSplit := bytes.Split(v, []byte("="))
+		cookieName := cookieSplit[0]
+		cookieValue := cookieSplit[1]
+		cookie := &Cookie{
+			Name:  string(cookieName),
+			Value: string(cookieValue),
+		}
+		cookies[string(cookieName)] = cookie
+	}
+
+	return cookies
 }
