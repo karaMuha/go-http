@@ -20,7 +20,7 @@ import (
 func main() {
 	router := goHttp.NewRouter()
 
-	router.HandleFunc("GET /", func(conn net.Conn, r *goHttp.Request) {
+	router.HandleFunc("GET /", func(res *goHttp.HttpResponse, req *goHttp.HttpRequest) {
 		fmt.Printf("Method: %s, Target: %s, Version: %s, Body: %s\n", r.Method, r.URI, r.HttpVersion, string(r.Body))
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	})
@@ -41,9 +41,20 @@ import (
 func main() {
 	router := goHttp.NewRouter()
 
-	router.HandleFunc("GET /", func(conn net.Conn, r *goHttp.Request) {
+	router.HandleFunc("GET /", func(res *goHttp.HttpResponse, req *goHttp.HttpRequest) {
 		fmt.Printf("Method: %s, Target: %s, Version: %s, Body: %s\n", r.Method, r.URI, r.HttpVersion, string(r.Body))
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+		
+		cookie := &goHttp.Cookie{
+			Name: "TestKey",
+			Value: "TestValue"
+			Secure: true,
+			HttpOnly: true,
+			Expires: time.Now().Add(1 * time.Hour)
+		}
+
+		res.SetCookie(cookie)
+		res.SetHeader("Content-Type", "application/json")
+		res.WriteStatus(200)
 	})
 
 	server := goHttp.NewServer("8080", router)
@@ -55,7 +66,7 @@ func main() {
 ```
 
 ## ToDos
-- provide a developer firendly response writer instead of the raw net.Conn connection
+- provide useful functionalities for HttpResponse struct
 - provide useful functionalities for HttpRequest struct
 - allow path values
 - allow query params
