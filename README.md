@@ -22,7 +22,18 @@ func main() {
 
 	router.HandleFunc("GET /", func(res *goHttp.HttpResponse, req *goHttp.HttpRequest) {
 		fmt.Printf("Method: %s, Target: %s, Version: %s, Body: %s\n", req.Method, req.URI, req.HttpVersion, string(req.Body))
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+		
+		cookie := &goHttp.Cookie{
+			Name: "TestKey",
+			Value: "TestValue"
+			Secure: true,
+			HttpOnly: true,
+			Expires: time.Now().Add(1 * time.Hour)
+		}
+
+		res.SetCookie(cookie)
+		res.SetHeader("Content-Type", "application/json")
+		res.WriteStatus(200)
 	})
 }
 ```
