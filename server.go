@@ -96,6 +96,7 @@ func parseRequest(conn net.Conn) (*HttpRequest, error) {
 		HttpVersion: httpVersion,
 		Headers:     headers,
 		Body:        body,
+		cookies:     make(map[string]*Cookie),
 	}, nil
 }
 

@@ -44,14 +44,14 @@ func (res *HttpResponse) writeResponseString() string {
 	// set cookies
 	for _, cookie := range res.cookies {
 		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
-		if !cookie.Expires.IsZero() {
-			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
-		}
 		if cookie.HttpOnly {
 			cookieString = cookieString + "; HttpOnly"
 		}
 		if cookie.Secure {
 			cookieString = cookieString + "; Secure"
+		}
+		if !cookie.Expires.IsZero() {
+			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
 		}
 		cookieString = cookieString + "\r\n"
 		responseString = responseString + cookieString
