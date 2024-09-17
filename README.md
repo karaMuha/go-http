@@ -68,6 +68,7 @@ func main() {
 ## ToDos
 - provide useful functionalities for HttpResponse struct
 - provide useful functionalities for HttpRequest struct
+- parse cookies from request
 - allow path values
 - allow query params
 - more to come...
