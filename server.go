@@ -49,13 +49,13 @@ func (s *Server) Listen() error {
 }
 
 func (s *Server) processRequest(conn net.Conn, errChan chan error) {
+	defer close(errChan)
 	defer func() {
 		if err := conn.Close(); err != nil {
 			errChan <- err
 			return
 		}
 	}()
-	defer close(errChan)
 
 	request, err := parseRequest(conn)
 	if err != nil {
