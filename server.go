@@ -42,7 +42,11 @@ func (s *Server) Listen() error {
 }
 
 func (s *Server) processRequest(conn net.Conn) {
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 
 	request, err := parseRequest(conn)
 	if err != nil {
