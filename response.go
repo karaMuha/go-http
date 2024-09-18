@@ -28,16 +28,16 @@ func (res *HttpResponse) SetHeader(key string, val string) {
 
 func (res *HttpResponse) WriteStatus(code int) {
 	if code < 100 || code > 599 {
-		code = 200
+		panic("Unexpected status code: " + strconv.Itoa(code))
 	}
 	res.statusCode = strconv.Itoa(code)
 }
 
-func (res *HttpResponse) Write(data []byte) {
+func (res *HttpResponse) WriteBody(data []byte) {
 	res.Body = data
 }
 
-func (res *HttpResponse) writeResponseString() string {
+func (res *HttpResponse) assembleResponseString() string {
 	responseString := "HTTP/1.1"
 	// set status code
 	responseString = responseString + " " + res.statusCode + "\r\n"

@@ -37,16 +37,32 @@ func (s *Server) Listen() error {
 			return err
 		}
 
-		go s.processRequest(conn)
+		errChan := make(chan error)
+		go s.processRequest(conn, errChan)
+
+		for err = range errChan {
+			if err != nil {
+				fmt.Println(err) // panic?
+			}
+		}
 	}
 }
 
-func (s *Server) processRequest(conn net.Conn) {
-	defer conn.Close()
+func (s *Server) processRequest(conn net.Conn, errChan chan error) {
+	defer func() {
+		if err := conn.Close(); err != nil {
+			errChan <- err
+			return
+		}
+	}()
+	defer close(errChan)
 
 	request, err := parseRequest(conn)
 	if err != nil {
-		conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
+		_, err := conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
+		if err != nil {
+			errChan <- err
+		}
 		return
 	}
 
@@ -54,16 +70,23 @@ func (s *Server) processRequest(conn net.Conn) {
 	if handler, ok := s.Routes.routes[endpoint]; ok {
 		response := NewHttpResponse()
 		handler(response, request)
-		responseString := response.writeResponseString()
-		conn.Write([]byte(responseString))
+		responseString := response.assembleResponseString()
+		_, err = conn.Write([]byte(responseString))
+		if err != nil {
+			errChan <- err
+		}
 		return
 	}
 
-	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	_, err = conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	if err != nil {
+		errChan <- err
+	}
 }
 
 func parseRequest(conn net.Conn) (*HttpRequest, error) {
 	lines := make(chan []byte)
+	defer close(lines)
 	go byteReader(lines, conn)
 	requestLineValues := bytes.Split(<-lines, []byte(" "))
 
@@ -106,7 +129,6 @@ func parseRequest(conn net.Conn) (*HttpRequest, error) {
 }
 
 func byteReader(channel chan []byte, connection net.Conn) {
-	defer close(channel)
 	buffer := make([]byte, 0)
 
 	for {
