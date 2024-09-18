@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"net"
 )
 
@@ -44,7 +45,7 @@ func (s *Server) Listen() error {
 func (s *Server) processRequest(conn net.Conn) {
 	defer func() {
 		if err := conn.Close(); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}()
 
@@ -52,7 +53,7 @@ func (s *Server) processRequest(conn net.Conn) {
 	if err != nil {
 		_, err = conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		return
 	}
@@ -64,14 +65,14 @@ func (s *Server) processRequest(conn net.Conn) {
 		responseString := response.assembleResponseString()
 		_, err = conn.Write([]byte(responseString))
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		return
 	}
 
 	_, err = conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
 
@@ -126,7 +127,7 @@ func byteReader(channel chan []byte, connection net.Conn) {
 		tmp := make([]byte, 1024)
 		n, err := connection.Read(tmp)
 		if err != nil && err != io.EOF {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		buffer = append(buffer, tmp[:n]...)
