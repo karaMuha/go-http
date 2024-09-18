@@ -1,6 +1,10 @@
 package http
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 type HttpResponse struct {
 	cookies    []*Cookie
@@ -38,31 +42,42 @@ func (res *HttpResponse) WriteBody(data []byte) {
 }
 
 func (res *HttpResponse) assembleResponseString() string {
-	responseString := "HTTP/1.1"
+	var sb strings.Builder
+	sb.WriteString("HTTP/1.1 ")
+	sb.WriteString(res.statusCode)
+	sb.WriteString("\r\n")
+	/* responseString := "HTTP/1.1"
 	// set status code
-	responseString = responseString + " " + res.statusCode + "\r\n"
+	responseString = responseString + " " + res.statusCode + "\r\n" */
 	// set cookies
 	for _, cookie := range res.cookies {
-		cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
+		sb.WriteString(fmt.Sprintf("Set-Cookie: %s=%s", cookie.Name, cookie.Value))
+		//cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
 		if cookie.HttpOnly {
-			cookieString = cookieString + "; HttpOnly"
+			sb.WriteString("; HttpOnly")
+			//cookieString = cookieString + "; HttpOnly"
 		}
 		if cookie.Secure {
-			cookieString = cookieString + "; Secure"
+			sb.WriteString("; Secure")
+			//cookieString = cookieString + "; Secure"
 		}
 		if !cookie.Expires.IsZero() {
-			cookieString = cookieString + "; Expires=" + cookie.Expires.String()
+			sb.WriteString(fmt.Sprintf("; Expires=%s", cookie.Expires.String()))
+			//cookieString = cookieString + "; Expires=" + cookie.Expires.String()
 		}
-		cookieString = cookieString + "\r\n"
-		responseString = responseString + cookieString
+		sb.WriteString("\r\n")
+		/* cookieString = cookieString + "\r\n"
+		responseString = responseString + cookieString */
 	}
 	// set headers
 	for k, v := range res.headers {
-		headerString := k + ": " + v + "\r\n"
-		responseString = responseString + headerString
+		sb.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+		/* headerString := k + ": " + v + "\r\n"
+		responseString = responseString + headerString */
 	}
 
-	responseString = responseString + "\r\n"
+	sb.WriteString("\r\n")
+	//responseString = responseString + "\r\n"
 
-	return responseString
+	return sb.String()
 }
