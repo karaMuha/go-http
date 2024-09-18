@@ -46,7 +46,10 @@ func (s *Server) processRequest(conn net.Conn) {
 
 	request, err := parseRequest(conn)
 	if err != nil {
-		conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
+		_, err = conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
 
@@ -55,11 +58,17 @@ func (s *Server) processRequest(conn net.Conn) {
 		response := NewHttpResponse()
 		handler(response, request)
 		responseString := response.assembleResponseString()
-		conn.Write([]byte(responseString))
+		_, err = conn.Write([]byte(responseString))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
 
-	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	_, err = conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func parseRequest(conn net.Conn) (*HttpRequest, error) {
