@@ -46,38 +46,29 @@ func (res *HttpResponse) assembleResponseString() string {
 	sb.WriteString("HTTP/1.1 ")
 	sb.WriteString(res.statusCode)
 	sb.WriteString("\r\n")
-	/* responseString := "HTTP/1.1"
-	// set status code
-	responseString = responseString + " " + res.statusCode + "\r\n" */
 	// set cookies
 	for _, cookie := range res.cookies {
 		sb.WriteString(fmt.Sprintf("Set-Cookie: %s=%s", cookie.Name, cookie.Value))
-		//cookieString := "Set-Cookie: " + cookie.Name + "=" + cookie.Value
 		if cookie.HttpOnly {
 			sb.WriteString("; HttpOnly")
-			//cookieString = cookieString + "; HttpOnly"
 		}
 		if cookie.Secure {
 			sb.WriteString("; Secure")
-			//cookieString = cookieString + "; Secure"
 		}
 		if !cookie.Expires.IsZero() {
 			sb.WriteString(fmt.Sprintf("; Expires=%s", cookie.Expires.String()))
-			//cookieString = cookieString + "; Expires=" + cookie.Expires.String()
 		}
 		sb.WriteString("\r\n")
-		/* cookieString = cookieString + "\r\n"
-		responseString = responseString + cookieString */
 	}
 	// set headers
 	for k, v := range res.headers {
 		sb.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
-		/* headerString := k + ": " + v + "\r\n"
-		responseString = responseString + headerString */
 	}
 
 	sb.WriteString("\r\n")
-	//responseString = responseString + "\r\n"
+	if len(res.Body) > 0 {
+		sb.WriteString(string(res.Body))
+	}
 
 	return sb.String()
 }
