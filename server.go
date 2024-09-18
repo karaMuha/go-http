@@ -63,6 +63,7 @@ func (s *Server) processRequest(conn net.Conn) {
 		response := NewHttpResponse()
 		handler(response, request)
 		responseString := response.assembleResponseString()
+		fmt.Println(responseString)
 		_, err = conn.Write([]byte(responseString))
 		if err != nil {
 			log.Println(err)
