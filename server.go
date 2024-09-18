@@ -37,22 +37,23 @@ func (s *Server) Listen() error {
 			return err
 		}
 
-		errChan := make(chan error)
-		go s.processRequest(conn, errChan)
+		//errChan := make(chan error)
+		go s.processRequest(conn)
 
-		for err = range errChan {
+		/* for err = range errChan {
 			if err != nil {
 				fmt.Println(err) // panic?
 			}
-		}
+		} */
 	}
 }
 
-func (s *Server) processRequest(conn net.Conn, errChan chan error) {
-	defer close(errChan)
+func (s *Server) processRequest(conn net.Conn) {
+	// defer close(errChan)
 	defer func() {
 		if err := conn.Close(); err != nil {
-			errChan <- err
+			fmt.Println(err)
+			// errChan <- err
 			return
 		}
 	}()
@@ -61,7 +62,8 @@ func (s *Server) processRequest(conn net.Conn, errChan chan error) {
 	if err != nil {
 		_, err := conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
 		if err != nil {
-			errChan <- err
+			fmt.Println(err)
+			// errChan <- err
 		}
 		return
 	}
@@ -73,14 +75,16 @@ func (s *Server) processRequest(conn net.Conn, errChan chan error) {
 		responseString := response.assembleResponseString()
 		_, err = conn.Write([]byte(responseString))
 		if err != nil {
-			errChan <- err
+			fmt.Println(err)
+			// errChan <- err
 		}
 		return
 	}
 
 	_, err = conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	if err != nil {
-		errChan <- err
+		fmt.Println(err)
+		// errChan <- err
 	}
 }
 
