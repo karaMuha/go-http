@@ -50,13 +50,14 @@ func (s *Server) Listen() error {
 
 func (s *Server) processRequest(conn net.Conn) {
 	// defer close(errChan)
-	defer func() {
+	/* defer func() {
 		if err := conn.Close(); err != nil {
 			fmt.Println(err)
 			// errChan <- err
 			return
 		}
-	}()
+	}() */
+	defer conn.Close()
 
 	request, err := parseRequest(conn)
 	if err != nil {
